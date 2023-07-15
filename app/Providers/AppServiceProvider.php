@@ -4,6 +4,14 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 
+use App\Repositories\Project\ProjectRepositoryInterface;
+use App\Repositories\State\StateRepositoryInterface;
+use App\Repositories\Task\TaskRepositoryInterface;
+
+use App\Repositories\Project\ProjectRepository;
+use App\Repositories\State\StateRepository;
+use App\Repositories\Task\TaskRepository;
+
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -11,7 +19,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind(ProjectRepositoryInterface::class, ProjectRepository::class);
+        $this->app->bind(StateRepositoryInterface::class, StateRepository::class);
+        $this->app->bind(TaskRepositoryInterface::class, TaskRepository::class);
     }
 
     /**

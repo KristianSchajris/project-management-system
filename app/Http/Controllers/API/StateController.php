@@ -4,26 +4,25 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\State;
+use App\Repositories\State\StateRepository;
 
 class StateController extends Controller
 {
+    protected $stateRepository;
+
+    public function __construct(StateRepository $stateRepository)
+    {
+        $this->stateRepository = $stateRepository;
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $states = State::all();
+        $states = $this->stateRepository->getAll();
 
         return response()->json($states);
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
     }
 
     /**
@@ -31,24 +30,8 @@ class StateController extends Controller
      */
     public function show(string $id)
     {
-        $state = State::findOrFail($id);
-
+        $state = $this->stateRepository->getById($id);
+        
         return response()->json($state);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
     }
 }

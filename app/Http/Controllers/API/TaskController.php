@@ -4,16 +4,23 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Task;
+use App\Repositories\Task\TaskRepository;
 
 class TaskController extends Controller
 {
+    protected $taskRepository;
+
+    public function __construct(TaskRepository $taskRepository)
+    {
+        $this->taskRepository = $taskRepository;
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $tasks = Task::all();
+        $tasks = $this->taskRepository->getAll();
 
         return response()->json($tasks);
     }
@@ -23,19 +30,8 @@ class TaskController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'task_title' => 'required|string|max:25',
-            'description' => 'required|string',
-            'id_state' => 'required|integer',
-            'id_project' => 'required|integer',
-        ]);
-
-        $task = new Task();
-        $task->task_title = $request->task_title;
-        $task->description = $request->description;
-        $task->id_state = $request->id_state;
-        $task->id_project = $request->id_project;
-        $task->save();
+        $data = $request->all();
+        $task = $this->taskRepository->create($data);
 
         return response()->json($task, 201);
     }
@@ -45,7 +41,7 @@ class TaskController extends Controller
      */
     public function show(string $id)
     {
-        $task = Task::findOrFail($id);
+        $task = $this->taskRepository->getById($id);
 
         return response()->json($task);
     }
@@ -55,19 +51,8 @@ class TaskController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $request->validate([
-            'task_title' => 'required|string|max:25',
-            'description' => 'required|string',
-            'id_state' => 'required|integer',
-            'id_project' => 'required|integer',
-        ]);
-
-        $task = Task::findOrFail($id);
-        $task->task_title = $request->task_title;
-        $task->description = $request->description;
-        $task->id_state = $request->id_state;
-        $task->id_project = $request->id_project;
-        $task->save();
+        $data = $request->all();
+        $task = $this->taskRepository->update($id, $data);
 
         return response()->json($task);
     }
@@ -77,9 +62,8 @@ class TaskController extends Controller
      */
     public function destroy(string $id)
     {
-        $task = Task::findOrFail($id);
-        $task->delete();
-
+        $this->taskRepository->delete($id);
+        
         return response()->json(null, 204);
     }
 }
